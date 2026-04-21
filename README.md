@@ -1,4 +1,4 @@
-#  Hand Gesture Puzzle
+# Hand Gesture Puzzle
 
 A real-time computer vision-based interactive puzzle game where users create and solve image puzzles using **hand gestures instead of a mouse or touch input**.
 
@@ -6,35 +6,35 @@ Built using **OpenCV** and **MediaPipe**, this project tracks hand movements in 
 
 ---
 
-## 🎬 Demo
+## Demo
 
-▶️ [Watch Demo Video](https://drive.google.com/file/d/1zRgMhcaL9ZyqrnTejsljVON1PPJveMRH/view?usp=drive_link)
-
----
-
-## ✨ Features
-
-* 🖐️ Real-time hand tracking using MediaPipe
-* ✌️ Two-hand frame selection (set your puzzle area)
-* 🤏 Pinch gesture to capture image
-* 🧩 Automatic puzzle generation (3x3 grid)
-* 🎯 Drag-and-drop puzzle solving using gestures
-* 🧠 Smooth pointer tracking
-* ⏱️ Timer-based gameplay
-* 🔀 Shuffle animation before solving
-* 🎮 Fully interactive without keyboard/mouse
+[Watch Demo Video](https://drive.google.com/file/d/1zRgMhcaL9ZyqrnTejsljVON1PPJveMRH/view?usp=drive_link)
 
 ---
 
-## 🛠 Tech Stack
+## Features
 
-* **Python**
-* **OpenCV** – for video processing & rendering
-* **MediaPipe** – for hand tracking & gesture detection
+- Real-time hand tracking using MediaPipe
+- Two-hand frame selection (set your puzzle area)
+- Pinch gesture to capture image
+- Automatic puzzle generation (3x3 grid)
+- Drag-and-drop puzzle solving using gestures
+- Smooth pointer tracking
+- Timer-based gameplay
+- Shuffle animation before solving
+- Fully interactive without keyboard/mouse
 
 ---
 
-## ⚙️ How to Run
+## Tech Stack
+
+- **Python**
+- **OpenCV** – for video processing & rendering
+- **MediaPipe** – for hand tracking & gesture detection
+
+---
+
+## How to Run
 
 ```bash
 git clone https://github.com/molly22-byte/hand-gesture-puzzle.git
@@ -45,7 +45,7 @@ python main.py
 
 ---
 
-## 🧠 How It Works
+## How It Works
 
 1. Camera captures live video using OpenCV
 2. MediaPipe detects hand landmarks in real-time
@@ -56,12 +56,12 @@ python main.py
 
 ---
 
-## 🚀 Future Improvements
+## Future Improvements
 
-* 🎮 Difficulty levels (4x4, 5x5 puzzles)
-* 🌐 Web-based version (no install required)
-* 👥 Multiplayer / competition mode
-* 📱 Mobile compatibility
-* 🧠 AI-based gesture improvements
+- Difficulty levels (4x4, 5x5 puzzles)
+- Web-based version (no install required)
+- Multiplayer / competition mode
+- Mobile compatibility
+- AI-based gesture improvements
 
 ---
