@@ -51,16 +51,6 @@ class HandTracker:
             index_up = hand.landmark[8].y < hand.landmark[6].y
             middle_up = hand.landmark[12].y < hand.landmark[10].y
 
-            if index_up and middle_up:
-                x = hand.landmark[8].x
-                y = hand.landmark[8].y
-                return True, x, y
-
-        return False, 0, 0
-    def get_two_fingers(self):
-        if self.results.multi_hand_landmarks:
-            hand = self.results.multi_hand_landmarks[0]
-
             ix, iy = hand.landmark[8].x, hand.landmark[8].y   # index
             mx, my = hand.landmark[12].x, hand.landmark[12].y # middle
 
@@ -81,21 +71,43 @@ class HandTracker:
             return True, points[0], points[1]
 
         return False, (0, 0), (0, 0)
+
     def get_index_pos(self):
-        if self.results.multi_hand_landmarks:
+        if self.results and self.results.multi_hand_landmarks:
             hand = self.results.multi_hand_landmarks[0]
             x = hand.landmark[8].x
             y = hand.landmark[8].y
             return True, x, y
-
         return False, 0, 0
+
+    def is_palm_open(self):
+        """Detects if all fingers are extended (open palm)."""
+        if not self.results or not self.results.multi_hand_landmarks:
+            return False
+            
+        for hand in self.results.multi_hand_landmarks:
+            # Indices for fingertips and their corresponding MCP (base) joints
+            tips = [8, 12, 16, 20]
+            pips = [6, 10, 14, 18]
+            
+            fingers_up = []
+            for tip, pip in zip(tips, pips):
+                if hand.landmark[tip].y < hand.landmark[pip].y:
+                    fingers_up.append(True)
+                else:
+                    fingers_up.append(False)
+            
+            # Thumb: tip x vs ip x (depends on hand orientation, but simple distance often works)
+            # For simplicity, we check if all 4 main fingers are up
+            if all(fingers_up):
+                return True
+        return False
+
     def get_two_hand_positions(self):
         points = []
-
-        if self.results.multi_hand_landmarks:
+        if self.results and self.results.multi_hand_landmarks:
             for hand in self.results.multi_hand_landmarks:
                 x = hand.landmark[8].x
                 y = hand.landmark[8].y
                 points.append((x, y))
-
         return points
