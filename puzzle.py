@@ -8,7 +8,10 @@ class Puzzle:
         self.tiles = []
         self.selected = None
 
-    def create(self, frame):
+    def create(self, frame, grid_size=None):
+        if grid_size:
+            self.grid_size = grid_size
+            
         h, w, _ = frame.shape
         th, tw = h // self.grid_size, w // self.grid_size
 
@@ -18,6 +21,8 @@ class Puzzle:
         for i in range(self.grid_size):
             for j in range(self.grid_size):
                 tile = frame[i*th:(i+1)*th, j*tw:(j+1)*tw]
+                # Ensure tile is the right size (handle rounding)
+                tile = cv2.resize(tile, (tw, th))
                 self.tiles.append(tile)
                 self.original_tiles.append(tile.copy())
 
@@ -33,9 +38,11 @@ class Puzzle:
     def get_index(self, x, y):
         col = int(x * self.grid_size)
         row = int(y * self.grid_size)
+        col = max(0, min(col, self.grid_size - 1))
+        row = max(0, min(row, self.grid_size - 1))
         return row * self.grid_size + col
     def swap(self, i, j):
-        if i != j:
+        if i is not None and j is not None and i != j:
             self.tiles[i], self.tiles[j] = self.tiles[j], self.tiles[i]
 
     def draw_selected(self, frame):
@@ -54,9 +61,18 @@ class Puzzle:
             x2 = x1 + tw
             y2 = y1 + th
 
-            cv2.rectangle(frame, (x1,y1), (x2,y2), (0,255,0), 3)
-    def is_solved(self, original_tiles):
+            # Glow effect
+            cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+            cv2.rectangle(frame, (x1-2, y1-2), (x2+2, y2+2), (180, 255, 180), 1)
+    def is_solved(self):
         for i in range(len(self.tiles)):
-            if not (self.tiles[i] == original_tiles[i]).all():
+            if not np.array_equal(self.tiles[i], self.original_tiles[i]):
                 return False
-        return True        
+        return True
+
+    def get_solved_percentage(self):
+        correct = 0
+        for i in range(len(self.tiles)):
+            if np.array_equal(self.tiles[i], self.original_tiles[i]):
+                correct += 1
+        return (correct / len(self.tiles)) * 100
