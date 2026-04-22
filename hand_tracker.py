@@ -29,16 +29,19 @@ class HandTracker:
         if self.results and self.results.multi_hand_landmarks:
 
             for hand in self.results.multi_hand_landmarks:
-                x1, y1 = hand.landmark[4].x, hand.landmark[4].y  # thumb
-                x2, y2 = hand.landmark[8].x, hand.landmark[8].y  # index
+                x1, y1 = hand.landmark[4].x, hand.landmark[4].y  # thumb tip
+                x2, y2 = hand.landmark[8].x, hand.landmark[8].y  # index tip
+
+                # Normalize by hand size (wrist -> index MCP) so the threshold
+                # is robust to how far the hand is from the camera.
+                wx, wy = hand.landmark[0].x, hand.landmark[0].y
+                mx, my = hand.landmark[5].x, hand.landmark[5].y
+                hand_size = ((mx-wx)**2 + (my-wy)**2)**0.5 or 1e-6
 
                 dist = ((x2-x1)**2 + (y2-y1)**2)**0.5
-
-                # 🔥 tighter condition
-                if dist < 0.05:
+                if dist / hand_size < 0.35:
                     return True, x2, y2
 
-            # no pinch
             hand = self.results.multi_hand_landmarks[0]
             return False, hand.landmark[8].x, hand.landmark[8].y
 

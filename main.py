@@ -3,7 +3,6 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 import cv2
 import time
-import random
 import numpy as np
 
 WINDOW_NAME = "Live Puzzle"
@@ -77,6 +76,10 @@ shuffle_start = 0
 palm_hold_start = None
 RESET_HOLD_TIME = 1.5 # seconds
 
+# detection throttle (run MediaPipe every Nth frame)
+frame_count = 0
+DETECT_EVERY = 2
+
 
 # ================= HELPERS =================
 def inside_box(px, py, x1, y1, x2, y2, w, h):
@@ -144,8 +147,10 @@ while True:
     frame = cv2.flip(frame, 1)
     h, w, _ = frame.shape
 
-    tracker.find_hands(frame)
+    if frame_count % DETECT_EVERY == 0:
+        tracker.find_hands(frame)
     tracker.draw_hands(frame)
+    frame_count += 1
 
     pinch, px, py = tracker.get_pinch()
     detected, ix, iy = tracker.get_index_pos()
@@ -221,11 +226,11 @@ while True:
             smooth_y = int(alpha * cy + (1 - alpha) * smooth_y)
 
         # ===== SHUFFLE =====
+        # The actual shuffle happens once in puzzle.create(); this is just a
+        # short visual pause so the player can see the scramble before the
+        # timer starts.
         if shuffling:
-            if time.time() - shuffle_start < 1.5:
-                i = random.randint(0, len(puzzle.tiles)-1)
-                j = random.randint(0, len(puzzle.tiles)-1)
-                puzzle.swap(i, j)
+            if time.time() - shuffle_start < 1.0:
                 draw_styled_text(output, "SHUFFLING...", (w//2 - 100, h//2))
             else:
                 shuffling = False
@@ -255,7 +260,21 @@ while True:
                         scores_handler.update_score(current_grid_size, final_time)
 
         prev_pinch = pinch
-        puzzle.draw_selected(output)
+
+        # Highlight the tile under the pointer while dragging
+        target_idx = None
+        if dragging and detected:
+            local = to_local(px, py, sel_x1, sel_y1, sel_x2, sel_y2, w, h)
+            if local:
+                target_idx = puzzle.get_index(local[0], local[1])
+
+        # Draw inside the puzzle region's coordinate space
+        if sel_x1 is not None:
+            puzzle_region = output[sel_y1:sel_y2, sel_x1:sel_x2]
+            puzzle.draw_selected(puzzle_region, target_idx=target_idx)
+
+        if not shuffling:
+            puzzle.draw_reference(output)
 
         if detected:
             cv2.circle(output, (smooth_x, smooth_y), 8, (255, 255, 255), -1)
