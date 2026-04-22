@@ -16,15 +16,15 @@ if not cap.isOpened():
     if not cap.isOpened():
         print("ERROR: Could not open camera at all. Please check your connection.")
     else:
-        print("Camera opened successfully at index 1.")
-else:
-    print("Camera opened successfully at index 0.")
+        pass # Camera opened successfully
 
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 
 cv2.namedWindow("Live Puzzle", cv2.WINDOW_NORMAL)
-cv2.setWindowProperty("Live Puzzle", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+# cv2.setWindowProperty("Live Puzzle", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN) # Disabled fullscreen for compatibility
+cv2.setWindowProperty("Live Puzzle", cv2.WND_PROP_TOPMOST, 1) # Force window to front
+cv2.resizeWindow("Live Puzzle", 1280, 720)
 
 tracker = HandTracker()
 scores_handler = ScoresManager()
@@ -116,14 +116,7 @@ while True:
     if key == ord('3'): current_grid_size = 5
 
     ret, frame = cap.read()
-    if not ret: 
-        # print("DEBUG: Frame not captured", end="\r")
-        continue
-
-    # Only print once to confirm it started
-    if 'first_frame_captured' not in locals():
-        print("DEBUG: Successfully capturing frames. Window should be open.")
-        first_frame_captured = True
+    if not ret: continue
     frame = cv2.flip(frame, 1)
     h, w, _ = frame.shape
 
