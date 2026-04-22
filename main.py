@@ -134,9 +134,10 @@ while True:
             break
     except cv2.error:
         break
-    if key == ord('1'): current_grid_size = 3
-    if key == ord('2'): current_grid_size = 4
-    if key == ord('3'): current_grid_size = 5
+    if mode == "camera":
+        if key == ord('1'): current_grid_size = 3
+        if key == ord('2'): current_grid_size = 4
+        if key == ord('3'): current_grid_size = 5
 
     ret, frame = cap.read()
     if not ret: continue
