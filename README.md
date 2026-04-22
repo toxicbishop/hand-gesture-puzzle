@@ -37,7 +37,7 @@ Built using **OpenCV** and **MediaPipe**, this project tracks hand movements in 
 ## How to Run
 
 ```bash
-git clone https://github.com/molly22-byte/hand-gesture-puzzle.git
+git clone https://github.com/toxicbishop/hand-gesture-puzzle.git
 cd hand-gesture-puzzle
 pip install -r requirements.txt
 python main.py
@@ -61,7 +61,9 @@ python main.py
 - Difficulty levels (4x4, 5x5 puzzles)
 - Web-based version (no install required)
 - Multiplayer / competition mode
-- Mobile compatibility
-- AI-based gesture improvements
 
 ---
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
