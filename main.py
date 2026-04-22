@@ -4,29 +4,46 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import cv2
 import time
 import random
+import numpy as np
+
+WINDOW_NAME = "Live Puzzle"
+cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_NORMAL)
+cv2.resizeWindow(WINDOW_NAME, 1280, 720)
+
+
+def show_loading(message):
+    splash = np.zeros((720, 1280, 3), dtype=np.uint8)
+    cv2.putText(splash, "Live Puzzle", (430, 320),
+                cv2.FONT_HERSHEY_SIMPLEX, 1.8, (255, 255, 255), 3)
+    cv2.putText(splash, message, (430, 400),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 255), 2)
+    cv2.imshow(WINDOW_NAME, splash)
+    cv2.waitKey(1)
+
+
+show_loading("Loading hand tracker...")
 from hand_tracker import HandTracker
 from puzzle import Puzzle
 from scores_manager import ScoresManager
 
 # ================= CAMERA =================
-cap = cv2.VideoCapture(0)
+show_loading("Opening camera...")
+
+# CAP_DSHOW is significantly faster than the default MSMF backend on Windows.
+cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
 if not cap.isOpened():
     print("ERROR: Could not open camera. Trying index 1...")
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(1, cv2.CAP_DSHOW)
     if not cap.isOpened():
         print("ERROR: Could not open camera at all. Please check your connection.")
-    else:
-        pass # Camera opened successfully
 
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 
-cv2.namedWindow("Live Puzzle", cv2.WINDOW_NORMAL)
-# cv2.setWindowProperty("Live Puzzle", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN) # Disabled fullscreen for compatibility
-cv2.setWindowProperty("Live Puzzle", cv2.WND_PROP_TOPMOST, 1) # Force window to front
-cv2.resizeWindow("Live Puzzle", 1280, 720)
-
+show_loading("Warming up model...")
 tracker = HandTracker()
+# Pre-warm MediaPipe with a dummy frame so the first real frame isn't slow.
+tracker.find_hands(np.zeros((720, 1280, 3), dtype=np.uint8))
 scores_handler = ScoresManager()
 
 current_grid_size = 3
@@ -109,8 +126,14 @@ def draw_overlay(img, text_lines, x, y, w, h):
 # ================= LOOP =================
 while True:
     # ================= INPUT HANDLING =================
-    key = cv2.waitKey(1)
-    if key & 0xFF == 27: break
+    key = cv2.waitKey(1) & 0xFF
+    if key == 27 or key == ord('q'): break
+    # Detect window closed via the X button
+    try:
+        if cv2.getWindowProperty(WINDOW_NAME, cv2.WND_PROP_VISIBLE) < 1:
+            break
+    except cv2.error:
+        break
     if key == ord('1'): current_grid_size = 3
     if key == ord('2'): current_grid_size = 4
     if key == ord('3'): current_grid_size = 5
@@ -176,7 +199,7 @@ while True:
                         solved = False
 
         prev_pinch = pinch
-        cv2.imshow("Live Puzzle", frame)
+        cv2.imshow(WINDOW_NAME, frame)
 
     # ================= PUZZLE MODE =================
     else:
@@ -255,10 +278,7 @@ while True:
                 "Hold palm to play again"
             ], w//2 - 200, h//2 - 100, 400, 200)
 
-        cv2.imshow("Live Puzzle", output)
-
-    if cv2.waitKey(1) & 0xFF == 27:
-        break
+        cv2.imshow(WINDOW_NAME, output)
 
 cap.release()
 cv2.destroyAllWindows()
