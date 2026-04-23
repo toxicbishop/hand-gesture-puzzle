@@ -4,14 +4,6 @@ A real-time computer vision-based interactive puzzle game where users create and
 
 Built using **OpenCV** and **MediaPipe**, this project tracks hand movements in real-time and enables a fully gesture-controlled experience.
 
----
-
-## Demo
-
-[Watch Demo Video](https://drive.google.com/file/d/1zRgMhcaL9ZyqrnTejsljVON1PPJveMRH/view?usp=drive_link)
-
----
-
 ## Features
 
 - Real-time hand tracking using MediaPipe
